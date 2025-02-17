@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+body { margin:0; padding:0; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+
+.map-overlay {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    position: absolute;
+    width: 17%;
+    top: 0;
+    left: 0;
+    padding: 10px;
+}
+
+.map-overlay .map-overlay-inner {
+    background-color: #fff;
+    box-shadow:0 1px 2px rgba(0, 0, 0, 0.20);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.map-overlay table {
+    border: none;
+    width: 100%;
+}
+
+.map-overlay h2 {
+    line-height: 24px;
+    display: block;
+    margin: 0 0 10px;
+}
+
+.map-overlay label {
+    font: 16px/18px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    vertical-align: bottom;
+    margin: 0;
+    padding: 0;
+}
+
+.map-overlay .legend .bar {
+    height: 10px;
+    width: 100%;
+    background: linear-gradient(to right, #FCA107, #7F3121);
+}
+
+.map-overlay input {
+    display: inline;
+    vertical-align: middle;
+    margin: 5px;
+    padding: 0;
+}
+
+.map-overlay p.credit {
+   margin: 5px 0 0 0;
+   padding: 0;
+}
+
+    </style>
+</head>
+<body>
+
+
+<div id='map'></div>
+
+<div class='map-overlay'>
+    <div class='map-overlay-inner'>
+        <h2>Discover Capital Ring</h2>
+         <p class="credit">Data: Census 2011, Office for Nat. Statistics. Cartography: <a href="http://citygeographics.org">citygeographics</a>.</p>
+    </div>
+</div>
+
+
+
+
+    <script>
+
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoicGFuZXZhIiwiYSI6ImNtNXk0NXdiOTBhM3AyanIyNHR1OXBsejEifQ.gELzGrqRoZiEhabFwjVkiw'; // Put your Mapbox Public Access token here
+
+    // Load a new map in the 'map' HTML div
+    var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/paneva/cm727uvwk01o501pb518cbloz', // map background layer location
+    center: [-0.19, 51.505], // starting position [lng, lat]
+    zoom: 11, // starting zoom
+    pitch: 0 // tilt of the viewpoint in degrees
+    });
+
+
+    map.on('load', function() {
+      // Set global light properties which influence 3D layer shadows
+      map.setLight({color: "#fff", intensity: 0.25, position: [1.15, 210, 30]});
+      // Add standard navigation control
+      map.addControl(new mapboxgl.NavigationControl());
+
+      // Add a popup to the center of the map
+      var popup = new mapboxgl.Popup({ closeOnClick: false })
+        .setLngLat([-0.19, 51.505])
+        .setHTML('<h3>Default Text</h3>')
+        .addTo(map);
+
+// // Add the label layer
+// 	map.addLayer({
+// 		'id': 'labels',
+// 		'type': 'symbol',
+//         source: {
+//           type: 'vector',
+//           url: 'mapbox://duncan2001.b6rqk9s2' // Your Mapbox tileset Map ID
+//         },
+// 		'source-layer': 'LabelCities2-6qmjf4', // name of tilesets
+// 		'layout': {
+// 			'text-field': '{Name2}',
+// 			'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+// 			'text-size': 14
+// 		},
+// 		'paint': {
+// 			'text-color': 'rgba(0,0,0,0.8)',
+// 			'text-halo-color': '#fff',
+// 			'text-halo-width': 1
+// 		}
+// 	});
+
+//Event listener for layer switch
+document.getElementById("layer1").addEventListener("click", function(){
+map.setPaintProperty('EngWal_Hex_Emp','fill-extrusion-opacity',0.95);
+map.setPaintProperty('EngWal_Hex_Res','fill-extrusion-opacity',0);
+});
+
+document.getElementById("layer2").addEventListener("click", function(){
+map.setPaintProperty('EngWal_Hex_Emp','fill-extrusion-opacity',0);
+map.setPaintProperty('EngWal_Hex_Res','fill-extrusion-opacity',0.95);
+});
+
+
+//Event listener for the zoom to buttons created using a for loop and switch case statement to set lat and long
+var x = document.getElementsByClassName('citylink');
+var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].addEventListener('click', function(e) {
+
+				var lat,long;
+
+				switch(e.target.id) {
+					case "birm": long=-1.8904; lat=52.4862; break;
+					case "bris": long=-2.5879; lat=51.4545; break;
+					case "leed": long=-1.5491; lat=53.8008; break;
+					case "lond": long=-0.1278; lat=51.5074; break;
+					case "manc": long=-2.2426; lat=53.4808; break;
+					case "newc": long=-1.6178; lat=54.9783; break;
+				}
+
+				map.flyTo({
+					center: [long,lat],
+					zoom: 9,
+					speed: 0.3,
+					pitch: 50
+					});
+			});
+		}
+
+});
+
+</script>
+
+</body>
+</html>
