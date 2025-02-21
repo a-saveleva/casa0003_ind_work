@@ -64,11 +64,10 @@
         }
 
     </style>
+
 </head>
 
 <body>
-
-
     <div id='map'></div>
 
     <div class='map-overlay'>
@@ -77,6 +76,10 @@
             <p class="credit">Data: Census 2011, Office for Nat. Statistics. Cartography: <a href="http://citygeographics.org">citygeographics</a>.</p>
         </div>
     </div>
+    
+    <!-- Animated popup library -->
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-animated-popup@v0.4.0/dist/mapbox-gl-animated-popup.min.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet" />
 
     <script>
 
@@ -99,6 +102,45 @@
         // map.setLight({color: "#fff", intensity: 0.25, position: [1.15, 210, 30]});
         // Add standard navigation control
         // map.addControl(new mapboxgl.NavigationControl());
+
+            map.addLayer({ // This is the layer which is triggerered on hover on the place circle
+                id: 'places_points_highlight',
+                type: 'circle',
+                source: {
+                    type: 'vector',
+                    url: 'mapbox://paneva.7kk3aqaa' //Tileset ID
+                },
+                'source-layer': 'places_wgs84-7ujhxl',
+                layout: {
+                    'visibility': 'visible'
+                },
+                paint: {
+                    'circle-color': '#adf',
+                    'circle-opacity': 0.5,
+                    'circle-stroke-width': 4,
+                    'circle-stroke-color': '#ff0000',
+                    'circle-stroke-opacity': 0,
+                    'circle-radius': 4,
+                }
+            });
+
+            map.addLayer({ //This is the layer with places as little circles
+                id: 'places_points_hover_reaction',
+                type: 'circle',
+                source: {
+                    type: 'vector',
+                    url: 'mapbox://paneva.7kk3aqaa' //Tileset ID
+                },
+                'source-layer': 'places_wgs84-7ujhxl',
+                layout: {
+                    'visibility': 'visible'
+                },
+                paint: {
+                    'circle-color': '#fffef7',
+                    'circle-opacity': 0,
+                    'circle-radius': 5,
+                }
+            });
 
             map.addLayer({ //This is the layer with places as little circles
                 id: 'places_points',
@@ -123,27 +165,6 @@
                 }
             });
 
-            map.addLayer({ // This is the layer which is triggerered on hover on the place circle
-                id: 'places_points',
-                type: 'circle',
-                source: {
-                    type: 'vector',
-                    url: 'mapbox://paneva.7kk3aqaa' //Tileset ID
-                },
-                'source-layer': 'places_wgs84-7ujhxl',
-                layout: {
-                    'visibility': 'visible'
-                },
-                paint: {
-                    'circle-color': '#fffef7',
-                    'circle-opacity': 0.5,
-                    'circle-stroke-width': 1
-                    'circle-stroke-color': '#ff0000',
-                    'circle-stroke-opacity': 0.5,
-                    'circle-radius': 2,
-                }
-            });
-
             map.addLayer({
                 id: 'capital_ring_line',
                 type: 'line',
@@ -164,32 +185,52 @@
                 }
             });
 
-            map.on('mousemove', function(e) {       // This is the main event listner which is triggered when the mouse moves
-                var la = map.queryRenderedFeatures(e.point, {   // This queries whether the mouse is over an object in the LocalAuthorities layer
-                    layers: ['places_points']
-                });
-
-
-                if (la.length==1) {   // This if statement is run when the mouse is over a local authority
-
-                    map.setFilter('lahighlight', ['==','name',la[0].properties.name]);  // Filter the highlight layer to show the local authority outline
-                    console.log(la[0].properties.name);
-                    document.getElementById('laname').innerHTML = la[0].properties.name; // Change the name in the top left box to show the local authority name
-                    console.log(la[0].id);
-                    console.log(la);
-
-                } else {
-                    map.setFilter('lahighlight', ['==','name','null']);
-                    console.log('No features');
-                    document.getElementById('laname').innerHTML = "Hover over a local authority";
+            // Create a popup, but don't add it to the map yet.
+            var place_name_popup = new AnimatedPopup({
+                closeButton: false,
+                closeOnClick: false,
+                offset: 50,
+                anchor: 'right',
+                openingAnimation: {
+                    duration: 250,
+                    easing: 'easeInOutBack',
+                    transform: 'scale',
+                },
+                closingAnimation: {
+                    duration: 250,
+                    easing: 'easeInBack',
+                    transform: 'scale',
                 }
+            }); 
 
+            map.on('mouseenter', 'places_points_hover_reaction', function (e) {
+                // Get the feature that the mouse entered
+                var place = e.features[0];  // 'features' array contains the map features under the cursor
 
+                if (place) {
+                    var coordinates = place.geometry.coordinates.slice();
+                    var description = "<h2>" + place.properties['GAZETTEER_ENTRY.NAME1'] + "</h2>";
+
+                    place_name_popup.setLngLat(coordinates)
+                        .setHTML(description)
+                        .addTo(map);  // Add the popup to the map
+
+                    // Change the cursor and apply the highlight filter
+                    map.getCanvas().style.cursor = 'pointer';
+                    map.setFilter('places_points_highlight', ['==', 'GAZETTEER_ENTRY.NAME1', place.properties['GAZETTEER_ENTRY.NAME1']]);
+                    // Set circle-stroke-opacity to 1 for the highlighted features
+                    map.setPaintProperty('places_points_highlight', 'circle-stroke-opacity', 1);
+                }
             });
 
+            map.on('mouseleave', 'places_points_hover_reaction', function (e) {
+                place_name_popup.remove();  // Remove the popup
+                // Reset the highlight filter and cursor
+                map.setFilter('places_points_highlight', ['==', 'GAZETTEER_ENTRY.NAME1', 'null']);
+                map.getCanvas().style.cursor = '';  // Reset the cursor
+            });
 
-});
-        })
+        });
 
     </script>
 
