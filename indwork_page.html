@@ -38,6 +38,12 @@
             margin: 0 0 10px;
         }
 
+        .map-overlay h3 {
+            line-height: 24px;
+            display: block;
+            margin: 0 0 10px;
+        }
+
         .map-overlay label {
             font: 16px/18px 'Helvetica Neue', Arial, Helvetica, sans-serif;
             vertical-align: bottom;
@@ -59,9 +65,90 @@
         }
 
         .map-overlay p.credit {
-        margin: 5px 0 0 0;
-        padding: 0;
+            margin: 5px 0 0 0;
+            padding: 0;
         }
+
+        .mapboxgl-popup-tip {
+            display: none; /* Hide the default tip */
+        }
+
+        .mapboxgl-popup-content {
+            background: transparent; /* Remove default background */
+            box-shadow: none; /* Remove box shadow */
+            padding: 0; /* Remove default padding */
+            border: none;
+        }
+
+        .place-parent-container {
+            display: flex;
+            flex-direction: column;
+            /* align-items: flex-start; Ensures vertical alignment */
+            gap: 5px; /* Space between elements */
+        }
+
+        .place-name-container {
+            /* background-color: transparent; */
+            display: flex;
+            align-items: flex-end;
+            /* gap: 18px; Space between popup and line */
+        }
+
+        .place-name-popup {
+            background-color: red !important;
+            max-height: 18px;
+            border-radius: 0px;
+            font-family: 'Calibri', sans-serif;
+            font-size: 12px !important;
+            color: white !important;
+            padding-left: 5px;
+            padding-right: 5px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .place-name-line {
+            width: 20px;
+            height: 18px;
+            background: black !important;
+        }
+
+        .category-container {
+            display: flex;
+            align-items: self-start; /* Ensures left alignment */
+            flex-direction: column;
+            gap: 5px; /* Space between popup and line */
+        }
+
+        .category_popup {
+            background: blue;
+            max-height: auto;
+            border-radius: 0px;
+            font-family: 'Calibri', sans-serif;
+            font-size: 14px;
+            color: red;
+            padding: 5px;
+            text-align: center;
+            opacity: 0; /* Initially hidden for animation */
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(200px); /* Start slightly lower */
+        }
+        .category_popup.show {
+            opacity: 1;
+            transform: translateY(0); /* Move into place */
+        }
+
+        /* @keyframes slide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        } */
 
     </style>
 
@@ -79,11 +166,8 @@
     
     <!-- Animated popup library -->
     <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-animated-popup@v0.4.0/dist/mapbox-gl-animated-popup.min.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet" />
 
     <script>
-
-
         mapboxgl.accessToken = 'pk.eyJ1IjoicGFuZXZhIiwiYSI6ImNtNXk0NXdiOTBhM3AyanIyNHR1OXBsejEifQ.gELzGrqRoZiEhabFwjVkiw'; // Put your Mapbox Public Access token here
 
         // Load a new map in the 'map' HTML div
@@ -138,7 +222,7 @@
                 paint: {
                     'circle-color': '#fffef7',
                     'circle-opacity': 0,
-                    'circle-radius': 5,
+                    'circle-radius': 10,
                 }
             });
 
@@ -189,7 +273,7 @@
             var place_name_popup = new AnimatedPopup({
                 closeButton: false,
                 closeOnClick: false,
-                offset: 50,
+                offset: 10,
                 anchor: 'right',
                 openingAnimation: {
                     duration: 250,
@@ -200,20 +284,104 @@
                     duration: 250,
                     easing: 'easeInBack',
                     transform: 'scale',
-                }
+                },
+                className: 'place-name-popup'
             }); 
 
+            // Create category popup - number 1
+            var place_category_popup_1 = new AnimatedPopup({
+                offset:[-100,40],
+                closeButton: false,
+                class: 'category_popup'
+            });
+            // Create category popup - number 2
+            var place_category_popup_2 = new AnimatedPopup({
+                offset:[-100,80],
+                closeButton: false,
+                class: 'category_popup'
+            });
+            // Create category popup - number 3
+            var place_category_popup_3 = new AnimatedPopup({
+                offset:[-100,120],
+                closeButton: false,
+                class: 'category_popup'
+            });
+
             map.on('mouseenter', 'places_points_hover_reaction', function (e) {
+
                 // Get the feature that the mouse entered
                 var place = e.features[0];  // 'features' array contains the map features under the cursor
 
                 if (place) {
                     var coordinates = place.geometry.coordinates.slice();
-                    var description = "<h2>" + place.properties['GAZETTEER_ENTRY.NAME1'] + "</h2>";
+                    // var description = "<h2>" + place.properties['GAZETTEER_ENTRY.NAME1'] + "</h2>";
+                    // var category_1 = "<h3 style='color: red; font-size: 12px;'>" + place.properties['place_categories'] + "</h3>";
+                      // Example: Future-proofing for three category lines
+                    var category_1 = "<div class='category_popup' id='cat1'>" + "green" + "</div>";
+                    var category_2 = "<div class='category_popup' id='cat2'>" + "royal" + "</div>";
+                    var category_3 = "<div class='category_popup' id='cat3'>" + "exquisite" + "</div>";
+                    var placeName = place.properties['GAZETTEER_ENTRY.NAME1'];
+                    
+                    // <div class="place-parent-container">
+                    //     <div class="place-name-container">
+                    //         <div class="place-name-popup">{{placeName}}</div>
+                    //         <div class="place-name-line"></div>
+                    //     </div>
 
+                    //     <div class="category-container">
+                    //         <div class="category_popup">{{category_1}}</div>
+                    //         <div class="category_popup">{{category_2}}</div>
+                    //         <div class="category_popup">{{category_3}}</div>
+                    //     </div>
+
+                    // </div>
+
+                    // var popupContainer = document.createElement("div");
+                    // popupContainer.classList.add("place-name-container");
+                    
+                    // var popupText = document.createElement("div");
+                    // popupText.classList.add("place-name-popup");
+                    // popupText.textContent = placeName;
+                    
+                    // var popupLine = document.createElement("div");
+                    // popupLine.classList.add("place-name-line");
+                    
+                    // popupContainer.appendChild(popupText);
+                    // popupContainer.appendChild(popupLine);
+                    
+                     // Dynamic HTML
+                    var popupContainer = document.createElement("div");
+                    popupContainer.classList.add("place-name-container");
+
+                    var popupText = document.createElement("div");
+                    popupText.classList.add("place-name-popup");
+                    popupText.textContent = placeName;
+
+                    var popupLine = document.createElement("div");
+                    popupLine.classList.add("place-name-line");
+
+                    popupContainer.appendChild(popupText);
+                    popupContainer.appendChild(popupLine);
+
+                    var categoryContainer = document.createElement("div");
+                    categoryContainer.classList.add("category-container");
+                    categoryContainer.innerHTML = category_1 + category_2 + category_3;
+
+                    var placeParentContainer = document.createElement("div");
+                    placeParentContainer.classList.add("place-parent-container");
+                    placeParentContainer.appendChild(popupContainer);
+                    placeParentContainer.appendChild(categoryContainer);
+
+                    // Add to the popup
                     place_name_popup.setLngLat(coordinates)
-                        .setHTML(description)
-                        .addTo(map);  // Add the popup to the map
+                        .setDOMContent(placeParentContainer)
+                        .addTo(map);
+
+                    // Apply animation delay
+                    setTimeout(() => document.getElementById('cat1').classList.add('show'), 200);
+                    setTimeout(() => document.getElementById('cat2').classList.add('show'), 400);
+                    setTimeout(() => document.getElementById('cat3').classList.add('show'), 600);
+
 
                     // Change the cursor and apply the highlight filter
                     map.getCanvas().style.cursor = 'pointer';
@@ -224,7 +392,10 @@
             });
 
             map.on('mouseleave', 'places_points_hover_reaction', function (e) {
-                place_name_popup.remove();  // Remove the popup
+                place_name_popup.remove();  // Remove the place name popup
+                place_category_popup_1.remove();  // Remove the place name popup
+                place_category_popup_2.remove();  // Remove the place name popup
+                place_category_popup_3.remove();  // Remove the place name popup
                 // Reset the highlight filter and cursor
                 map.setFilter('places_points_highlight', ['==', 'GAZETTEER_ENTRY.NAME1', 'null']);
                 map.getCanvas().style.cursor = '';  // Reset the cursor
