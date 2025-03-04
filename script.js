@@ -56,7 +56,7 @@ map.on('load', async function () {
                 ['boolean', ['feature-state', 'hover'], false], 1, // Fully visible on hover
                 0 // Hidden by default
             ],
-            'circle-radius': 4,
+            'circle-radius': 10,
             'circle-stroke-color': 'white',
             'circle-stroke-width': 7,
         }
