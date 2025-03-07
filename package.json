@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@watergis/maplibre-gl-legend": "^2.0.5"
+    "@watergis/maplibre-gl-legend": "^2.0.5",
+    "rollup-plugin-unused": "^0.1.1"
   }
 }

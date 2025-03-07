@@ -1,7 +1,11 @@
-// vite.config.js
-export default {
-    server: {
-      open: true,  // Automatically open the browser when the dev server starts
-    }
-  }
-  
+export default ({
+  esbuild: {
+    supported: {
+      'top-level-await': true
+    },
+  },
+  base: '/casa0003_ind_work/',
+  // plugins: [
+  //   basicSsl() //not needed in production
+  // ]  
+});
