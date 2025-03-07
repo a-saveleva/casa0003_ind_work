@@ -22,19 +22,21 @@ body {
 }
 
 .map-overlay {
-    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-family: "Lexend", sans-serif;
+    font-weight: 300;
+    font-size: 13px;
     position: absolute;
-    width: 17%;
+    width: 13%;
     top: 0;
     left: 0;
-    padding: 10px;
+    padding: 15px;
 }
 
 .map-overlay .map-overlay-inner {
     background-color: #fff;
     box-shadow:0 1px 2px rgba(0, 0, 0, 0.20);
     border-radius: 3px;
-    padding: 10px;
+    padding: 20px;
     margin-bottom: 10px;
 }
 
@@ -45,15 +47,38 @@ body {
 
 .map-overlay h2 {
     line-height: 24px;
+    font-weight: 700;
     display: block;
     margin: 0 0 10px;
+    padding-top: 0px;
+    padding-bottom: 10px;
+    /* padding: 10px; */
 }
 
 .map-overlay h3 {
     line-height: 24px;
+    font-weight: 500;
     display: block;
     margin: 0 0 10px;
+    padding-top: 10px;
+    padding-bottom: 0px;
 }
+
+.map-overlay h4 {
+    line-height: 18px;
+    font-weight: 500;
+    display: block;
+    margin: 0 0 10px;
+    padding-top: 10px;
+    padding-bottom: 0px;
+    
+}
+
+/* .map-overlay h4 {
+    line-height: 24px;
+    display: block;
+    margin: 0 0 10px;
+} */
 
 .map-overlay label {
     font: 16px/18px 'Helvetica Neue', Arial, Helvetica, sans-serif;
@@ -126,9 +151,9 @@ body {
 
 
 .place-name-popup {
-    background-color: red !important;
+    background-color: #ED562C !important;
     max-height: 20px;
-    min-width: 100px;
+    min-width: 200px;
     border-radius: 0px;
     font-family: "Lexend", sans-serif;
     font-weight: 500;
@@ -143,9 +168,9 @@ body {
 }
 
 .place-name-line {
-    width: 20px;
+    width: 10px;
     height: 20px;
-    background: black !important;
+    background: #7C2A13 !important;
     /* position: absolute; */
     /* transform: translateX(-0px);  */
 }
@@ -155,8 +180,8 @@ body {
     display: flex;
     align-items: self-start; /* Ensures left alignment */
     flex-direction: column;
-    gap: 3px; /* Space between popup and line */
-    transform: translateX(28px); 
+    gap: -4px; /* Space between popup and line */
+    transform: translateX(20px); 
 }
 
 .category-popup {
@@ -165,11 +190,11 @@ body {
     border-radius: 0px;
     font-family: "Lexend", sans-serif;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 11px;
     font-display: swap;
     color: black;
     padding: 0px;
-    text-align: center;
+    text-align: left;
     opacity: 0; /* Initially hidden for animation */
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     transform: translateY(300px); /* Start slightly lower */

@@ -4,8 +4,11 @@
     "vite": "^6.2.0"
   },
   "scripts": {
-    "dev": "vite", 
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@watergis/maplibre-gl-legend": "^2.0.5"
   }
 }
